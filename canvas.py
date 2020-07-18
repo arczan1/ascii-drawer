@@ -15,15 +15,12 @@ class Canvas:
         # Initialize empty board
         self._board = [[" " for _ in range(width)] for _ in range(height)]
 
-    def set_char(self, x: int, y: int, char: str):
-        """Set sign at (x, y) to given value
+    def set_char(self, char: str):
+        """Set sign at cursor position
 
-        :param x: From 0 to (width-1)
-        :param y: From 0 to (height-1)
         :param char: New sign
         """
-        if self.is_inside(x, y):
-            self._board[y][x] = char
+        self._board[self.cursor["y"]][self.cursor["x"]] = char
 
     def get_char(self, x: int, y: int) -> str:
         """Return sign at (x, y)
