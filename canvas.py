@@ -3,22 +3,34 @@ class Canvas:
         Representation of ASCII art image
     """
 
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int, image=None):
         """
-        :param width: ASCII image width
-        :param height: ASCII image height
+        :param width: ASCII image width(if image is None)
+        :param height: ASCII image height(if image is None)
+        :param image: 2-dimensional list of chars
+
+        TODO:
+            Support for images with different rows length
         """
         self.width = width
         self.height = height
         self.cursor = {"x": 0, "y": 0}
 
-        # Initialize empty board
-        self._board = [[" " for _ in range(width)] for _ in range(height)]
+        if image:
+            self._board = image.copy()
+            self.height = len(image)
+            self.width = len(image[0])
+        else:
+            # Initialize empty board
+            self._board = [[" " for _ in range(width)] for _ in range(height)]
 
     def set_char(self, char: str):
         """Set sign at cursor position
 
         :param char: New sign
+
+        TODO:
+            Checking if char is not incorrect(e.g. "\n")
         """
         self._board[self.cursor["y"]][self.cursor["x"]] = char
 

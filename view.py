@@ -1,4 +1,5 @@
 from canvas import Canvas
+from state_controller import StateController
 
 
 class Frame:
@@ -67,10 +68,25 @@ class ControlView(View):
 
     def draw(self, frame: Frame):
         frame.add_line_at(self.x, self.y, list("Controls:"))
-        frame.add_line_at(self.x, self.y+1, list("q - EXIT"))
-        frame.add_line_at(self.x, self.y+2, list("i - INSERT mode"))
-        frame.add_line_at(self.x, self.y+3, list("Backspace -"))
-        frame.add_line_at(self.x, self.y+4, list("  Normal mode"))
+        if StateController.get_mode() == "COMMAND":
+            frame.add_line_at(self.x, self.y+1, list("q: EXIT"))
+            frame.add_line_at(self.x, self.y+2, list("i: INSERT mode"))
+            frame.add_line_at(self.x, self.y+3, list("s: SAVE"))
+        elif StateController.get_mode() == "INSERT":
+            frame.add_line_at(self.x, self.y+1, list("Backspace: "))
+            frame.add_line_at(self.x, self.y+2, list(" COMMAND mode"))
+            frame.add_line_at(self.x, self.y+3, list("OTHER: insert char"))
+
+
+class TextBoxView(View):
+    """Draw text on the frame"""
+    def __init__(self, x: int, y: int, width: int, height: int):
+        super().__init__(x, y)
+        self.width = width
+        self.height = height
+
+    def draw(self, text: str):
+        pass
 
 
 class ModeView(View):
@@ -80,7 +96,7 @@ class ModeView(View):
 
     def draw(self, frame: Frame):
         frame.add_line_at(self.x, self.y, list("MODE:"))
-        frame.add_line_at(self.x, self.y+1, list(""))
+        frame.add_line_at(self.x, self.y+1, list(StateController.get_mode()))
 
 
 class ViewController:
@@ -89,12 +105,19 @@ class ViewController:
         self.canvas = canvas
         self.canvas_view = CanvasView(canvas, 1, 1)
         self.control_view = ControlView(canvas.width+2, 1)
-        self.mode_view = ModeView(canvas.width+2, canvas.height-1)
+        mode_y = canvas.height
+        if mode_y < 10:
+            mode_y = 8
+        self.mode_view = ModeView(canvas.width+2, mode_y-1)
 
     def draw(self):
         """Draw canvas and borders on a frame and displays it"""
         # Create new frame
-        frame = Frame(self.canvas.width+2+20, self.canvas.height+2)
+        frame_height = self.canvas.height+2
+        # Min frame height is 10
+        if frame_height < 10:
+            frame_height = 10
+        frame = Frame(self.canvas.width+2+20, frame_height)
 
         # Border
         self.draw_border(frame)
@@ -115,16 +138,31 @@ class ViewController:
         frame.display()
 
     def draw_border(self, frame: Frame):
+        """Draw borders on frame
+
+        :param frame: Frame object to draw on
+
+        TODO:
+            Simplify code
+        """
         # Top and bottom
         frame.add_line_at(1, 0, ["-" for _ in range(self.canvas.width)])
         frame.add_line_at(1, self.canvas.height+1,
                           ["-" for _ in range(self.canvas.width)])
 
         frame.add_line_at(self.canvas.width+1, 0, ["-" for _ in range(20)])
-        frame.add_line_at(self.canvas.width+1, self.canvas.height+1,
+        frame.add_line_at(self.canvas.width+1, frame.height-4,
                           ["-" for _ in range(20)])
-        frame.add_line_at(self.canvas.width+1, self.canvas.height-2,
-                          ["-" for _ in range(20)])
+        frame.add_line_at(self.canvas.width+2, frame.height-1,
+                          ["-" for _ in range(19)])
+
+        # Left and right
+        for y in range(1, self.canvas.height+1):
+            frame.add_char_at(0, y, "|")
+
+        for y in range(1, frame.height-1):
+            frame.add_char_at(self.canvas.width+1, y, "|")
+            frame.add_char_at(frame.width-1, y, "|")
 
         # Corners
         frame.add_char_at(0, 0, "+")
@@ -133,9 +171,4 @@ class ViewController:
         frame.add_char_at(self.canvas.width+1, self.canvas.height+1, "+")
         frame.add_char_at(frame.width-1, 0, "+")
         frame.add_char_at(frame.width-1, frame.height-1, "+")
-
-        # Left and right
-        for y in range(1, self.canvas.height+1):
-            frame.add_char_at(0, y, "|")
-            frame.add_char_at(self.canvas.width+1, y, "|")
-            frame.add_char_at(frame.width-1, y, "|")
+        frame.add_char_at(self.canvas.width+1, frame.height-1, "+")
