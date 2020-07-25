@@ -1,8 +1,8 @@
 class StateController:
-    """Static class that holds important informantions like current mode"""
+    """Static class that holds important informations like current mode"""
 
     # Possible values:
-    #  NORMAL - You can move cursor(Arrows)
+    #  COMMAND - You can move cursor(Arrows)
     #           and change mode to another
     #  INSERT - You can change chars and move using Arrows
     _mode = "COMMAND"

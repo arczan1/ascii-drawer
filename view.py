@@ -7,8 +7,8 @@ class Frame:
         self.width = width
         self.height = height
 
-        self._screen = [[" " for _ in range(width)]
-                        for _ in range(height)]
+        # Fill frame with " "
+        self._screen = [[" " for _ in range(width)] for _ in range(height)]
 
     def is_inside(self, x: int, y: int) -> bool:
         """Check if point(x, y) is inside frame coordinates
@@ -32,6 +32,8 @@ class Frame:
             self._screen[y][x] = char
 
     def display(self):
+        """Display frame on the screen"""
+        # Move cursor to top left corner
         print("\033[1;1H", end="")
         for row in self._screen:
             print("".join(row))
@@ -72,6 +74,7 @@ class ControlView(View):
             frame.add_line_at(self.x, self.y+1, list("q: EXIT"))
             frame.add_line_at(self.x, self.y+2, list("i: INSERT mode"))
             frame.add_line_at(self.x, self.y+3, list("s: SAVE"))
+            frame.add_line_at(self.x, self.y+4, list("S: SAVE AS"))
         elif StateController.get_mode() == "INSERT":
             frame.add_line_at(self.x, self.y+1, list("Backspace: "))
             frame.add_line_at(self.x, self.y+2, list(" COMMAND mode"))

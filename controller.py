@@ -9,10 +9,15 @@ import termios
 
 class Controller:
     """Controls views and user input"""
-    def __init__(self, path_to_file: str):
-        image = self.load_image(path_to_file)
+    def __init__(self, width=10, height=10, path_to_file=None):
+        if path_to_file is not None:
+            # Create canvas with loaded image
+            image = self.load_image(path_to_file)
+            self.canvas = Canvas(image=image)
+        else:
+            # Create empty canvas
+            self.canvas = Canvas(width, height)
         self.path_to_file = path_to_file
-        self.canvas = Canvas(10, 10, image)
         self.view_controller = ViewController(self.canvas)
 
     def start(self):

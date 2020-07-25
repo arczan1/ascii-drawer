@@ -3,24 +3,31 @@ class Canvas:
         Representation of ASCII art image
     """
 
-    def __init__(self, width: int, height: int, image=None):
+    def __init__(self, width=10, height=10, image=None):
         """
         :param width: ASCII image width(if image is None)
         :param height: ASCII image height(if image is None)
         :param image: 2-dimensional list of chars
-
-        TODO:
-            Support for images with different rows length
         """
-        self.width = width
-        self.height = height
+        # Place cursor at (0, 0)
         self.cursor = {"x": 0, "y": 0}
 
-        if image:
+        if image:   # Load image
+            # set width equal to length of the longest row
+            self.width = len(image[0])
+            for row in image:
+                if self.width < len(row):
+                    self.width = len(row)
+
             self._board = image.copy()
             self.height = len(image)
-            self.width = len(image[0])
-        else:
+
+            # Add SPACES at the end of rows shorter than self.width
+            for row in self._board:
+                row += [" " for _ in range(self.width - len(row))]
+        else:   # Create empty image
+            self.width = width
+            self.height = height
             # Initialize empty board
             self._board = [[" " for _ in range(width)] for _ in range(height)]
 
@@ -28,11 +35,9 @@ class Canvas:
         """Set sign at cursor position
 
         :param char: New sign
-
-        TODO:
-            Checking if char is not incorrect(e.g. "\n")
         """
-        self._board[self.cursor["y"]][self.cursor["x"]] = char
+        if char not in ("\n", "\t", "\r"):
+            self._board[self.cursor["y"]][self.cursor["x"]] = char
 
     def get_char(self, x: int, y: int) -> str:
         """Return sign at (x, y)
@@ -60,10 +65,18 @@ class Canvas:
         return True
 
     def __iter__(self):
+        """Return canvas object ready to iterate over rows
+
+        :return: Canvas object(self)
+        """
         self.iter_num = -1
         return self
 
     def __next__(self):
+        """Iterate over rows
+
+        :return: row
+        """
         self.iter_num += 1
         if self.iter_num >= self.height:
             raise StopIteration
