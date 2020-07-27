@@ -1,10 +1,8 @@
+from getkey import getkey, keys
+
 from view import ViewController
 from state_controller import StateController
 from canvas import Canvas
-# For input
-import tty
-import sys
-import termios
 
 
 class Controller:
@@ -29,24 +27,23 @@ class Controller:
         while True:
             self.view_controller.draw()
 
-            sign = Controller.get_input()
-            sign.lower()
-            if sign == "q":
+            # sign = Controller.get_input()
+            # sign.lower()
+            key = getkey()
+            if key == keys.ESC:
                 return
-            elif sign == "\x1b":  # Arrow
-                self.get_input()  # Skip "["
-                sign = self.get_input()
-                if sign == "D":
+            elif key in (keys.UP, keys.DOWN, keys.RIGHT, keys.LEFT):  # Arrow
+                if key == keys.LEFT:
                     self.canvas.move_cursor_left()
-                elif sign == "C":
+                elif key == keys.RIGHT:
                     self.canvas.move_cursor_right()
-                elif sign == "B":
+                elif key == keys.DOWN:
                     self.canvas.move_cursor_down()
-                elif sign == "A":
+                elif key == keys.UP:
                     self.canvas.move_cursor_up()
-            elif sign == "i":
+            elif key == "i":
                 self.insert_mode_loop()
-            elif sign == "s":
+            elif key == "s":
                 self.save_image()
 
     def insert_mode_loop(self):
@@ -55,44 +52,21 @@ class Controller:
         while True:
             self.view_controller.draw()
 
-            sign = Controller.get_input()
-            if sign == "\x7f":  # Backspace
+            key = getkey()
+            if key == keys.ESC:
                 StateController.set_mode("COMMAND")
                 return  # Return to COMMAND mode
-            elif sign == "\x1b":  # Arrow
-                self.get_input()  # Skip "["
-                sign = self.get_input()
-                if sign == "D":
+            elif key in (keys.UP, keys.DOWN, keys.RIGHT, keys.LEFT):  # Arrow
+                if key == keys.LEFT:
                     self.canvas.move_cursor_left()
-                elif sign == "C":
+                elif key == keys.RIGHT:
                     self.canvas.move_cursor_right()
-                elif sign == "B":
+                elif key == keys.DOWN:
                     self.canvas.move_cursor_down()
-                elif sign == "A":
+                elif key == keys.UP:
                     self.canvas.move_cursor_up()
             else:
-                self.canvas.set_char(sign)
-
-    @staticmethod
-    def get_input() -> str:
-        """Read one char from user input
-
-        :return: Single sign from input
-        """
-        # Read terminal settings
-        file_descriptor = sys.stdin.fileno()
-        settings = termios.tcgetattr(file_descriptor)
-
-        # Set terminal mode
-        tty.setraw(file_descriptor)
-
-        # Read char
-        sign = sys.stdin.read(1)
-
-        # Restore old settings
-        termios.tcsetattr(file_descriptor, termios.TCSADRAIN, settings)
-
-        return sign
+                self.canvas.set_char(key)
 
     def load_image(self, path: str) -> list:
         """Read content of file and returns it as 2-dimensional list

@@ -34,7 +34,7 @@ class Frame:
     def display(self):
         """Display frame on the screen"""
         # Move cursor to top left corner
-        print("\033[1;1H", end="")
+        print("\033[1;1H\033[37m\033[40m", end="")
         for row in self._screen:
             print("".join(row))
 
@@ -71,25 +71,29 @@ class ControlView(View):
     def draw(self, frame: Frame):
         frame.add_line_at(self.x, self.y, list("Controls:"))
         if StateController.get_mode() == "COMMAND":
-            frame.add_line_at(self.x, self.y+1, list("q: EXIT"))
+            frame.add_line_at(self.x, self.y+1, list("ESC: EXIT"))
             frame.add_line_at(self.x, self.y+2, list("i: INSERT mode"))
             frame.add_line_at(self.x, self.y+3, list("s: SAVE"))
             frame.add_line_at(self.x, self.y+4, list("S: SAVE AS"))
         elif StateController.get_mode() == "INSERT":
-            frame.add_line_at(self.x, self.y+1, list("Backspace: "))
-            frame.add_line_at(self.x, self.y+2, list(" COMMAND mode"))
-            frame.add_line_at(self.x, self.y+3, list("OTHER: insert char"))
+            frame.add_line_at(self.x, self.y+1, list("ESC: COMMAND mode"))
+            frame.add_line_at(self.x, self.y+2, list("OTHER: insert char"))
 
 
-class TextBoxView(View):
-    """Draw text on the frame"""
-    def __init__(self, x: int, y: int, width: int, height: int):
+class MessageBoxView(View):
+    """Draw message on the frame"""
+    def __init__(self, x: int, y: int, width: int, height: int, text=""):
         super().__init__(x, y)
         self.width = width
         self.height = height
+        self.text = text
 
-    def draw(self, text: str):
-        pass
+    def draw(self, frame: Frame):
+        """
+        TODO:
+            Everything ;)
+        """
+        frame.add_line_at(self.x, self.y, "test".split())
 
 
 class ModeView(View):
